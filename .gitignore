@@ -1,0 +1,29 @@
+## .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+
+## Visual Studio
+.vs/
+.vscode/
+.idea/
+
+## Test results
+TestResults/
+*.trx
+*.coverage
+
+## OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## NuGet
+*.nupkg
+packages/
+*.nuget.g.props
+*.nuget.g.targets
+
+## Local tooling
+.atl/

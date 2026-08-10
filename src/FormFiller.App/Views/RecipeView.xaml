@@ -1,0 +1,124 @@
+<UserControl x:Class="FormFiller.App.Views.RecipeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:FormFiller.Core.Models;assembly=FormFiller.Core"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1200">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Header="Templates" Grid.Column="0" Margin="0,0,4,0">
+                <DockPanel>
+                    <Button DockPanel.Dock="Top" Content="Refresh templates"
+                            Command="{Binding LoadTemplatesCommand}" Padding="10,4" Margin="0,0,0,6" />
+                    <ListView ItemsSource="{Binding Templates}"
+                              SelectedItem="{Binding SelectedTemplate}"
+                              Height="100">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
+                                    <TextBlock FontSize="11" Foreground="Gray"
+                                               Text="{Binding WindowTitle}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </DockPanel>
+            </GroupBox>
+
+            <GroupBox Header="Recipes" Grid.Column="1" Margin="4,0,0,0">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                        <Button Content="New recipe" Command="{Binding NewRecipeCommand}" Padding="10,4" />
+                        <Button Content="Delete recipe" Command="{Binding DeleteRecipeCommand}"
+                                Padding="10,4" Margin="8,0,0,0" />
+                    </StackPanel>
+                    <ListView ItemsSource="{Binding Recipes}"
+                              SelectedItem="{Binding SelectedRecipe}"
+                              Height="70">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </DockPanel>
+            </GroupBox>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBox Grid.Column="1"
+                     Text="{Binding SelectedRecipe.Name, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalContentAlignment="Center" />
+            <Button Grid.Column="2" Content="Save recipe" Command="{Binding SaveRecipeCommand}"
+                    Padding="12,6" Margin="8,0,0,0" />
+        </Grid>
+
+        <GroupBox Grid.Row="2" Header="Steps" Margin="0,8,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                    <Button Content="Add SetField" Command="{Binding AddStepCommand}"
+                            CommandParameter="{x:Static models:RecipeStepType.SetField}" Padding="10,4" />
+                    <Button Content="Add ClickButton" Command="{Binding AddStepCommand}"
+                            CommandParameter="{x:Static models:RecipeStepType.ClickButton}" Padding="10,4" Margin="6,0,0,0" />
+                    <Button Content="Add Wait" Command="{Binding AddStepCommand}"
+                            CommandParameter="{x:Static models:RecipeStepType.Wait}" Padding="10,4" Margin="6,0,0,0" />
+                    <Button Content="Add WaitForWindow" Command="{Binding AddStepCommand}"
+                            CommandParameter="{x:Static models:RecipeStepType.WaitForWindow}" Padding="10,4" Margin="6,0,0,0" />
+                    <Button Content="Add ClickIfWindowVisible" Command="{Binding AddStepCommand}"
+                            CommandParameter="{x:Static models:RecipeStepType.ClickIfWindowVisible}" Padding="10,4" Margin="6,0,0,0" />
+                    <Button Content="Remove" Command="{Binding RemoveStepCommand}"
+                            Padding="10,4" Margin="6,0,0,0" />
+                    <Button Content="Move up" Command="{Binding MoveUpStepCommand}"
+                            Padding="10,4" Margin="6,0,0,0" />
+                    <Button Content="Move down" Command="{Binding MoveDownStepCommand}"
+                            Padding="10,4" Margin="6,0,0,0" />
+                </StackPanel>
+                <DataGrid ItemsSource="{Binding Steps}"
+                          SelectedItem="{Binding SelectedStep}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridComboBoxColumn Header="Step type" Width="*"
+                                                SelectedItemBinding="{Binding StepType, UpdateSourceTrigger=PropertyChanged}"
+                                                ItemsSource="{Binding DataContext.StepTypes, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                        <DataGridTextColumn Header="Target" Width="*"
+                                            Binding="{Binding Target, UpdateSourceTrigger=PropertyChanged}" />
+                        <DataGridTextColumn Header="Value" Width="*"
+                                            Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </GroupBox>
+
+        <DockPanel Grid.Row="3" Margin="0,8,0,0">
+            <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Foreground="DimGray"
+                       Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+        </DockPanel>
+    </Grid>
+</UserControl>
