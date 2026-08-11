@@ -17,17 +17,22 @@ public sealed record CapturedControl(
     string AutomationId,
     string ControlType,
     bool SupportsValuePattern,
-    bool SupportsInvokePattern);
+    bool SupportsInvokePattern,
+    bool SupportsSelectionItem = false,
+    bool SupportsToggle = false);
 
 /// <summary>
 /// Translates a captured control into a <see cref="RecipeStep"/> using the existing step vocabulary.
 ///
 /// Translation rules:
-/// - A control that supports ValuePattern becomes a SetField step (Target = AutomationId or Name).
+/// - A control that supports ValuePattern, SelectionItemPattern or TogglePattern becomes a SetField
+///   step (Target = AutomationId or Name). These patterns mark a value-bearing control: edit boxes,
+///   combo boxes, checkboxes, radios and date pickers are all set-fields, not buttons.
 /// - A control that supports InvokePattern becomes a ClickButton step (Target = AutomationId or Name).
-/// - ValuePattern wins over InvokePattern unless the control was explicitly invoked (forceInvoke),
-///   because a single control can expose both patterns.
-/// - Controls without a usable name or automation id, or without either pattern, are skipped.
+/// - A value-bearing control wins over InvokePattern unless the control was explicitly invoked
+///   (forceInvoke), because a single control can expose both sets of patterns.
+/// - Controls without a usable name or automation id, or without any of the recognized patterns,
+///   are skipped.
 /// </summary>
 public static class StepTranslation
 {
@@ -46,7 +51,7 @@ public static class StepTranslation
             return ClickButton(target, sortOrder);
         }
 
-        if (control.SupportsValuePattern)
+        if (control.SupportsValuePattern || control.SupportsSelectionItem || control.SupportsToggle)
         {
             return SetField(target, sortOrder);
         }
@@ -83,6 +88,9 @@ public static class StepTranslation
 ///   a button is recorded even when no value changes and no invoke event is raised.
 /// - Value property changed: captures edits to editable controls (SetField).
 /// - Invoke: captures button activations (ClickButton).
+///
+/// Radios, checkboxes and date pickers surface SelectionItemPattern/TogglePattern and are
+/// translated to SetField steps, so focusing them records a set-field just like a text box.
 ///
 /// Steps are deduplicated so that consecutive SetField steps for the same control (and the
 /// same for ClickButton) collapse into a single step. The recorded Value of a SetField step
@@ -279,8 +287,17 @@ public sealed class RecipeRecorder : IDisposable
         var controlType = SafeRead(() => element.ControlType.ToString(), string.Empty);
         var supportsValue = SafeRead(() => element.Patterns.Value.IsSupported, false);
         var supportsInvoke = SafeRead(() => element.Patterns.Invoke.IsSupported, false);
+        var supportsSelectionItem = SafeRead(() => element.Patterns.SelectionItem.IsSupported, false);
+        var supportsToggle = SafeRead(() => element.Patterns.Toggle.IsSupported, false);
 
-        return new CapturedControl(name, automationId, controlType, supportsValue, supportsInvoke);
+        return new CapturedControl(
+            name,
+            automationId,
+            controlType,
+            supportsValue,
+            supportsInvoke,
+            supportsSelectionItem,
+            supportsToggle);
     }
 
     private static string ReadString(AutomationProperty<string> property)

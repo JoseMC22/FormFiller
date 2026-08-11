@@ -34,7 +34,9 @@ public partial class MappingViewModel : ViewModelBase
     {
         FieldType.Text,
         FieldType.ComboBox,
-        FieldType.CheckBox
+        FieldType.CheckBox,
+        FieldType.RadioButton,
+        FieldType.DatePicker
     };
 
     private readonly TemplateRepository _templateRepository;

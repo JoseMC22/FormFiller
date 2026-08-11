@@ -63,6 +63,12 @@ public static class FormAutomation
                         case FieldType.CheckBox:
                             SetCheckBoxValue(element, value);
                             break;
+                        case FieldType.RadioButton:
+                            SetRadioButtonValue(element, value);
+                            break;
+                        case FieldType.DatePicker:
+                            SetDatePickerValue(element, value);
+                            break;
                     }
                 }
                 catch (Exception ex)
@@ -231,6 +237,45 @@ public static class FormAutomation
         {
             element.Patterns.Toggle.Pattern.Toggle();
         }
+    }
+
+    private static void SetRadioButtonValue(AutomationElement element, string value)
+    {
+        // Radios can only be turned on through UI automation; a falsy/empty value is a no-op
+        // because deselecting a radio safely is not possible across providers.
+        if (!IsTruthy(value))
+        {
+            return;
+        }
+
+        if (element.Patterns.SelectionItem.IsSupported)
+        {
+            if (!element.Patterns.SelectionItem.Pattern.IsSelected.ValueOrDefault)
+            {
+                element.Patterns.SelectionItem.Pattern.Select();
+            }
+
+            return;
+        }
+
+        if (!element.Patterns.Toggle.IsSupported)
+        {
+            throw new InvalidOperationException("the element supports neither SelectionItemPattern nor TogglePattern");
+        }
+
+        if (element.Patterns.Toggle.Pattern.ToggleState.ValueOrDefault != ToggleState.On)
+        {
+            element.Patterns.Toggle.Pattern.Toggle();
+        }
+    }
+
+    private static void SetDatePickerValue(AutomationElement element, string value)
+    {
+        // The WinForms DateTimePicker exposes a ValuePattern but its SetValue silently ignores
+        // the request, so the reliable path is keyboard input: focus, select all, then type.
+        element.Focus();
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+        Keyboard.Type(value);
     }
 
     private static bool IsTruthy(string value)

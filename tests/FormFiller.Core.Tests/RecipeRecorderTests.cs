@@ -88,6 +88,59 @@ public sealed class StepTranslationTests
         Assert.Equal(RecipeStepType.ClickButton, step!.StepType);
         Assert.Equal("btnGuardar", step.Target);
     }
+
+    [Fact]
+    public void ToStep_SelectionItemControl_ReturnsSetField()
+    {
+        var control = new CapturedControl(
+            "Person", "rdbPersona", "RadioButton", false, false, SupportsSelectionItem: true);
+
+        var step = StepTranslation.ToStep(control, 0);
+
+        Assert.NotNull(step);
+        Assert.Equal(RecipeStepType.SetField, step!.StepType);
+        Assert.Equal("rdbPersona", step.Target);
+    }
+
+    [Fact]
+    public void ToStep_SelectionItemControlWithoutAutomationId_FallsBackToName()
+    {
+        var control = new CapturedControl(
+            "Company", string.Empty, "RadioButton", false, false, SupportsSelectionItem: true);
+
+        var step = StepTranslation.ToStep(control, 2);
+
+        Assert.NotNull(step);
+        Assert.Equal(RecipeStepType.SetField, step!.StepType);
+        Assert.Equal("Company", step.Target);
+        Assert.Equal(2, step.SortOrder);
+    }
+
+    [Fact]
+    public void ToStep_ToggleControl_ReturnsSetField()
+    {
+        var control = new CapturedControl(
+            "Active", "chkActivo", "CheckBox", false, false, SupportsToggle: true);
+
+        var step = StepTranslation.ToStep(control, 0);
+
+        Assert.NotNull(step);
+        Assert.Equal(RecipeStepType.SetField, step!.StepType);
+        Assert.Equal("chkActivo", step.Target);
+    }
+
+    [Fact]
+    public void ToStep_SelectionItemControlAlsoInvokable_ForcedInvokeReturnsClickButton()
+    {
+        var control = new CapturedControl(
+            "Guardar", "btnGuardar", "Button", false, true, SupportsSelectionItem: true);
+
+        var step = StepTranslation.ToStep(control, 0, forceInvoke: true);
+
+        Assert.NotNull(step);
+        Assert.Equal(RecipeStepType.ClickButton, step!.StepType);
+        Assert.Equal("btnGuardar", step.Target);
+    }
 }
 
 [Collection("MuestraApp fixture")]

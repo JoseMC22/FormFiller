@@ -193,9 +193,15 @@ public static class UiInspector
             case "Edit":
                 return (FieldType.Text, false);
             case "ComboBox":
-                return (FieldType.ComboBox, false);
+                return IsNativeDateTimePicker(element)
+                    ? (FieldType.DatePicker, false)
+                    : (FieldType.ComboBox, false);
             case "CheckBox":
                 return (FieldType.CheckBox, false);
+            case "RadioButton":
+                return (FieldType.RadioButton, false);
+            case "DateTimePicker":
+                return (FieldType.DatePicker, false);
             case "Button":
                 var isInvokable = false;
                 try
@@ -212,8 +218,26 @@ public static class UiInspector
         }
     }
 
-    private static bool IsEditable(AutomationElement element, FieldType fieldType)
+    /// <summary>
+    /// WinForms exposes a DateTimePicker as a ComboBox control whose native window class is
+    /// "SysDateTimePick32". UI Automation offers no DateTimePicker control type, so the native
+    /// class is the reliable signal for classifying it as a date picker.
+    /// </summary>
+    private static bool IsNativeDateTimePicker(AutomationElement element)
     {
+        try
+        {
+            var className = element.Properties.ClassName.ValueOrDefault ?? string.Empty;
+            return className.Contains("SysDateTimePick32", StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            // The property may be unsupported or the element went stale.
+            return false;
+        }
+    }
+
+    private static bool IsEditable(AutomationElement element, FieldType fieldType)    {
         if (fieldType is not (FieldType.Text or FieldType.ComboBox))
         {
             return false;

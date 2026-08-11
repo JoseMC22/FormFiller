@@ -7,5 +7,6 @@ public enum FieldType
     CheckBox = 2,
     Button = 3,
     DatePicker = 4,
-    Other = 5
+    Other = 5,
+    RadioButton = 6
 }

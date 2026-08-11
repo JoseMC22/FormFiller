@@ -41,10 +41,19 @@ public sealed class MuestraAppRichFixtureTests
             var active = AssertField(template, "Active", "CheckBox");
             Assert.Equal(FieldType.CheckBox, active.FieldType);
 
-            AssertField(template, "Person", "RadioButton");
-            AssertField(template, "Company", "RadioButton");
+            var person = AssertField(template, "Person", "RadioButton");
+            Assert.Equal(FieldType.RadioButton, person.FieldType);
 
-            Assert.NotNull(template.Fields.FirstOrDefault(f => f.AutomationId == "dtpFechaAlta"));
+            var company = AssertField(template, "Company", "RadioButton");
+            Assert.Equal(FieldType.RadioButton, company.FieldType);
+
+            var dateField = template.Fields.FirstOrDefault(f => f.AutomationId == "dtpFechaAlta");
+            Assert.NotNull(dateField);
+            Assert.Equal("Date", dateField.Name);
+            Assert.Equal(FieldType.DatePicker, dateField.FieldType);
+            // WinForms exposes the DateTimePicker as a ComboBox control type; the
+            // native "SysDateTimePick32" class is what makes it a DatePicker.
+            Assert.Equal("ComboBox", dateField.ControlType);
             Assert.NotNull(template.Fields.FirstOrDefault(f => f.AutomationId == "cboPais"));
             Assert.NotNull(template.Fields.FirstOrDefault(f => f.AutomationId == "txtObservaciones"));
             Assert.NotNull(template.Fields.FirstOrDefault(f => f.AutomationId == "txtPassword"));
@@ -113,6 +122,48 @@ public sealed class MuestraAppRichFixtureTests
             Assert.Equal(string.Empty, ReadField(template, hwnd, "Observations"));
             Assert.Null(ReadComboSelection(hwnd, "cboPais"));
             Assert.Equal(ToggleState.Off, ReadCheckbox(hwnd, "chkActivo"));
+        }
+        finally
+        {
+            Kill(process);
+        }
+    }
+
+    [Fact]
+    public void FillFields_RadioAndDate_AreSetAndReadBack()
+    {
+        using var process = MuestraAppFixture.Start();
+        try
+        {
+            process.WaitForInputIdle(5000);
+            var hwnd = MuestraAppFixture.WaitForMainWindowHandle(process, TimeSpan.FromSeconds(5));
+            Assert.NotEqual(IntPtr.Zero, hwnd);
+
+            var template = UiInspector.CaptureWindow(hwnd, "MuestraApp Radio Date");
+
+            FormAutomation.FillFields(hwnd, template, new Dictionary<string, string>
+            {
+                ["Codigo"] = "EMP-002",
+                ["Nombre"] = "Radio Date Test",
+                ["Person"] = "true",
+                ["Company"] = "false",
+                ["Date"] = "15/01/2026"
+            });
+
+            Assert.Equal("EMP-002", ReadField(template, hwnd, "Codigo"));
+            Assert.Equal("Radio Date Test", ReadField(template, hwnd, "Nombre"));
+            Assert.Equal("15/01/2026", ReadField(template, hwnd, "Date"));
+            Assert.True(ReadRadioSelected(hwnd, "rdbPersona"));
+            Assert.False(ReadRadioSelected(hwnd, "rdbEmpresa"));
+
+            FormAutomation.FillFields(hwnd, template, new Dictionary<string, string>
+            {
+                ["Person"] = "false",
+                ["Company"] = "true"
+            });
+
+            Assert.True(ReadRadioSelected(hwnd, "rdbEmpresa"));
+            Assert.False(ReadRadioSelected(hwnd, "rdbPersona"));
         }
         finally
         {
@@ -215,6 +266,15 @@ public sealed class MuestraAppRichFixtureTests
         var root = automation.FromHandle(hwnd);
         var element = root!.FindFirstDescendant(cf => cf.ByAutomationId(automationId));
         return element!.Patterns.Toggle.Pattern.ToggleState.ValueOrDefault;
+    }
+
+    private static bool ReadRadioSelected(IntPtr hwnd, string automationId)
+    {
+        using var automation = new UIA3Automation();
+        using var application = Application.Attach(GetProcessId(hwnd));
+        var root = automation.FromHandle(hwnd);
+        var element = root!.FindFirstDescendant(cf => cf.ByAutomationId(automationId));
+        return element!.Patterns.SelectionItem.Pattern.IsSelected.ValueOrDefault;
     }
 
     private static string? ReadComboSelection(IntPtr hwnd, string automationId)
