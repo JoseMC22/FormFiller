@@ -16,8 +16,13 @@ namespace FormFiller.App;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(string? trialBanner = null)
     {
         InitializeComponent();
+
+        if (!string.IsNullOrWhiteSpace(trialBanner))
+        {
+            TrialStatusText.Text = trialBanner;
+        }
     }
 }

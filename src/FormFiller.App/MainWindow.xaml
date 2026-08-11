@@ -6,21 +6,28 @@
         xmlns:views="clr-namespace:FormFiller.App.Views"
         mc:Ignorable="d"
         Title="FormFiller" Height="700" Width="1200">
-    <TabControl>
-        <TabItem Header="Inspector">
-            <views:InspectorView />
-        </TabItem>
-        <TabItem Header="Mapping">
-            <views:MappingView />
-        </TabItem>
-        <TabItem Header="Runner">
-            <views:RunnerView />
-        </TabItem>
-        <TabItem Header="Recipes">
-            <views:RecipeView />
-        </TabItem>
-        <TabItem Header="Recorder">
-            <views:RecorderView />
-        </TabItem>
-    </TabControl>
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock x:Name="TrialStatusText" Foreground="DimGray" />
+            </StatusBarItem>
+        </StatusBar>
+        <TabControl>
+            <TabItem Header="Inspector">
+                <views:InspectorView />
+            </TabItem>
+            <TabItem Header="Mapping">
+                <views:MappingView />
+            </TabItem>
+            <TabItem Header="Runner">
+                <views:RunnerView />
+            </TabItem>
+            <TabItem Header="Recipes">
+                <views:RecipeView />
+            </TabItem>
+            <TabItem Header="Recorder">
+                <views:RecorderView />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>
