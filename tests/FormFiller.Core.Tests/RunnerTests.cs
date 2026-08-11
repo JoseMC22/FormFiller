@@ -110,4 +110,161 @@ public sealed class RunnerTests
             }
         }
     }
+
+    [Fact]
+    public void RunRow_SingleAttempt_WhenRetriesDisabled_OnFailure()
+    {
+        using var process = MuestraAppFixture.Start();
+        try
+        {
+            process.WaitForInputIdle(5000);
+
+            var hwnd = MuestraAppFixture.WaitForMainWindowHandle(process, TimeSpan.FromSeconds(5));
+            Assert.NotEqual(IntPtr.Zero, hwnd);
+
+            var result = RunRowWithMissingField(hwnd, new RunOptions(null));
+
+            Assert.False(result.Success);
+            Assert.Equal(1, result.AttemptsUsed);
+        }
+        finally
+        {
+            Kill(process);
+        }
+    }
+
+    [Fact]
+    public void RunRow_Retries_OnFailure_UpToMaxRetries()
+    {
+        using var process = MuestraAppFixture.Start();
+        try
+        {
+            process.WaitForInputIdle(5000);
+
+            var hwnd = MuestraAppFixture.WaitForMainWindowHandle(process, TimeSpan.FromSeconds(5));
+            Assert.NotEqual(IntPtr.Zero, hwnd);
+
+            var options = new RunOptions(
+                null,
+                MaxRetriesPerRow: 2,
+                RetryDelay: TimeSpan.FromMilliseconds(10));
+
+            var result = RunRowWithMissingField(hwnd, options);
+
+            Assert.False(result.Success);
+            Assert.Equal(3, result.AttemptsUsed);
+        }
+        finally
+        {
+            Kill(process);
+        }
+    }
+
+    [Fact]
+    public void RunRow_SucceedsOnFirstAttempt_WhenRetriesEnabled()
+    {
+        using var process = MuestraAppFixture.Start();
+        try
+        {
+            process.WaitForInputIdle(5000);
+
+            var hwnd = MuestraAppFixture.WaitForMainWindowHandle(process, TimeSpan.FromSeconds(5));
+            Assert.NotEqual(IntPtr.Zero, hwnd);
+
+            var template = UiInspector.CaptureWindow(hwnd, "MuestraApp Retry Smoke");
+            var options = new RunOptions(
+                null,
+                MaxRetriesPerRow: 2,
+                RetryDelay: TimeSpan.FromMilliseconds(10));
+
+            var result = Runner.RunRow(
+                hwnd,
+                template,
+                new Dictionary<string, string> { ["Codigo"] = "ABC-123" },
+                options);
+
+            Assert.True(result.Success);
+            Assert.Equal(1, result.AttemptsUsed);
+        }
+        finally
+        {
+            Kill(process);
+        }
+    }
+
+    [Fact]
+    public void RunAll_PropagatesAttemptsUsedAndRowNumber()
+    {
+        using var process = MuestraAppFixture.Start();
+        try
+        {
+            process.WaitForInputIdle(5000);
+
+            var hwnd = MuestraAppFixture.WaitForMainWindowHandle(process, TimeSpan.FromSeconds(5));
+            Assert.NotEqual(IntPtr.Zero, hwnd);
+
+            var mappings = new List<FieldMapping>
+            {
+                new() { FieldName = "Inexistente", ExcelColumn = "A" }
+            };
+            var columns = new List<string> { "A" };
+            var rows = new List<IReadOnlyList<string>>
+            {
+                new List<string> { "value" }
+            };
+            var options = new RunOptions(
+                null,
+                MaxRetriesPerRow: 1,
+                RetryDelay: TimeSpan.FromMilliseconds(10));
+
+            RunRowResult? reported = null;
+            Runner.RunAll(
+                hwnd,
+                new FormTemplate { Name = "RunAll retry", Fields = { new FormField { Name = "Inexistente" } } },
+                mappings,
+                columns,
+                rows,
+                options,
+                onRowDone: result => reported = result);
+
+            Assert.NotNull(reported);
+            Assert.False(reported!.Success);
+            Assert.Equal(2, reported.RowNumber);
+            Assert.Equal(2, reported.AttemptsUsed);
+        }
+        finally
+        {
+            Kill(process);
+        }
+    }
+
+    private static RunRowResult RunRowWithMissingField(IntPtr hwnd, RunOptions options)
+    {
+        var template = new FormTemplate
+        {
+            Name = "Missing field retry test",
+            Fields = { new FormField { Name = "Inexistente", FieldType = FieldType.Text } }
+        };
+
+        return Runner.RunRow(
+            hwnd,
+            template,
+            new Dictionary<string, string> { ["Inexistente"] = "x" },
+            options);
+    }
+
+    private static void Kill(Process process)
+    {
+        if (!process.HasExited)
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch
+            {
+                // Best-effort cleanup of the fixture process.
+            }
+        }
+    }
 }

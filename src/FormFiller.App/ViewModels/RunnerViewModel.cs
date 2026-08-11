@@ -7,6 +7,7 @@ using FormFiller.Core.Automation;
 using FormFiller.Core.Data;
 using FormFiller.Core.Excel;
 using FormFiller.Core.Models;
+using FormFiller.Core.Reporting;
 using Microsoft.Win32;
 
 namespace FormFiller.App.ViewModels;
@@ -21,6 +22,8 @@ public partial class RunnerViewModel : ViewModelBase
     private readonly List<IReadOnlyList<string>> _allRows = new();
 
     private CancellationTokenSource? _cancellation;
+
+    private RunPauseGate? _pauseGate;
 
     public ObservableCollection<FormTemplate> Templates { get; } = new();
 
@@ -60,6 +63,15 @@ public partial class RunnerViewModel : ViewModelBase
     private bool _isRunning;
 
     [ObservableProperty]
+    private bool _isPaused;
+
+    [ObservableProperty]
+    private int _maxRetriesPerRow;
+
+    [ObservableProperty]
+    private int _retryDelayMilliseconds = 500;
+
+    [ObservableProperty]
     private int _currentRow;
 
     [ObservableProperty]
@@ -85,7 +97,19 @@ public partial class RunnerViewModel : ViewModelBase
 
     partial void OnSelectedSheetChanged(string? value) => LoadSheet();
 
-    partial void OnIsRunningChanged(bool value) => RunCommand.NotifyCanExecuteChanged();
+    partial void OnIsRunningChanged(bool value)
+    {
+        RunCommand.NotifyCanExecuteChanged();
+        PauseCommand.NotifyCanExecuteChanged();
+        ResumeCommand.NotifyCanExecuteChanged();
+        ExportReportCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnIsPausedChanged(bool value)
+    {
+        PauseCommand.NotifyCanExecuteChanged();
+        ResumeCommand.NotifyCanExecuteChanged();
+    }
 
     [RelayCommand]
     private void LoadTemplates()
@@ -239,19 +263,24 @@ public partial class RunnerViewModel : ViewModelBase
             SelectedSubmitButton,
             StartRowIndex: startRowIndex,
             EndRowIndex: endRowIndex,
-            Recipe: selectedRecipe);
+            Recipe: selectedRecipe,
+            MaxRetriesPerRow: Math.Max(0, MaxRetriesPerRow),
+            RetryDelay: TimeSpan.FromMilliseconds(Math.Max(0, RetryDelayMilliseconds)));
 
         var windowHandle = SelectedWindow!.MainWindowHandle;
         var columns = Columns.ToList();
         var dispatcher = Application.Current?.Dispatcher;
         var cancellation = new CancellationTokenSource();
         _cancellation = cancellation;
+        var pauseGate = new RunPauseGate();
+        _pauseGate = pauseGate;
 
         Results.Clear();
         ProgressTotal = totalRows;
         ProgressCurrent = 0;
         CurrentRow = 0;
         IsRunning = true;
+        IsPaused = false;
 
         var okCount = 0;
         var failedCount = 0;
@@ -295,7 +324,8 @@ public partial class RunnerViewModel : ViewModelBase
                             Append();
                         }
                     },
-                    ct: cancellation.Token);
+                    ct: cancellation.Token,
+                    pauseGate: pauseGate);
             }, cancellation.Token);
         }
         catch (OperationCanceledException)
@@ -309,8 +339,10 @@ public partial class RunnerViewModel : ViewModelBase
         finally
         {
             _cancellation = null;
+            _pauseGate = null;
             cancellation.Dispose();
             IsRunning = false;
+            IsPaused = false;
 
             if (canceled)
             {
@@ -329,4 +361,65 @@ public partial class RunnerViewModel : ViewModelBase
 
     [RelayCommand]
     private void Stop() => _cancellation?.Cancel();
+
+    private bool CanPause() => IsRunning && !IsPaused;
+
+    private bool CanResume() => IsRunning && IsPaused;
+
+    [RelayCommand(CanExecute = nameof(CanPause))]
+    private void Pause()
+    {
+        _pauseGate?.Pause();
+        IsPaused = true;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanResume))]
+    private void Resume()
+    {
+        _pauseGate?.Resume();
+        IsPaused = false;
+    }
+
+    private bool CanExportReport() => !IsRunning && Results.Count > 0;
+
+    [RelayCommand(CanExecute = nameof(CanExportReport))]
+    private void ExportReport()
+    {
+        if (Results.Count == 0)
+        {
+            return;
+        }
+
+        var dialog = new SaveFileDialog
+        {
+            Title = "Export run report",
+            Filter = "CSV files (*.csv)|*.csv|Excel files (*.xlsx)|*.xlsx",
+            DefaultExt = ".csv"
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            var results = Results.ToList();
+            if (string.Equals(Path.GetExtension(dialog.FileName), ".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                RunReportExporter.ToExcel(results, dialog.FileName);
+            }
+            else
+            {
+                using var writer = File.CreateText(dialog.FileName);
+                RunReportExporter.ToCsv(results, writer);
+            }
+
+            StatusMessage = $"Report exported: {Path.GetFileName(dialog.FileName)}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Failed to export report: {ex.Message}";
+        }
+    }
 }

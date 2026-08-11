@@ -10,6 +10,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -113,6 +114,9 @@
             <StackPanel Grid.Column="8" Orientation="Horizontal" Margin="12,0,0,0">
                 <Button Content="Run" Command="{Binding RunCommand}" Padding="14,5" FontWeight="Bold" />
                 <Button Content="Stop" Command="{Binding StopCommand}" Padding="14,5" Margin="6,0,0,0" />
+                <Button Content="Pause" Command="{Binding PauseCommand}" Padding="10,5" Margin="6,0,0,0" />
+                <Button Content="Resume" Command="{Binding ResumeCommand}" Padding="10,5" Margin="6,0,0,0" />
+                <Button Content="Export..." Command="{Binding ExportReportCommand}" Padding="10,5" Margin="6,0,0,0" />
             </StackPanel>
 
             <TextBlock Grid.Column="10" Text="Row:" VerticalAlignment="Center" HorizontalAlignment="Right"
@@ -120,11 +124,29 @@
             <TextBlock Grid.Column="11" Text="{Binding CurrentRow}" VerticalAlignment="Center" />
         </Grid>
 
-        <ProgressBar Grid.Row="2" Height="18" Margin="0,8,0,0"
+        <Grid Grid.Row="2" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Max retries per row:" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBox Grid.Column="1" VerticalContentAlignment="Center"
+                     Text="{Binding MaxRetriesPerRow, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Grid.Column="2" Text="Retry delay (ms):" VerticalAlignment="Center" Margin="12,0,6,0" />
+            <TextBox Grid.Column="3" VerticalContentAlignment="Center"
+                     Text="{Binding RetryDelayMilliseconds, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+
+        <ProgressBar Grid.Row="3" Height="18" Margin="0,8,0,0"
                      Minimum="0" Maximum="{Binding ProgressTotal}"
                      Value="{Binding ProgressCurrent}" />
 
-        <GroupBox Grid.Row="3" Header="Results" Margin="0,8,0,0">
+        <GroupBox Grid.Row="4" Header="Results" Margin="0,8,0,0">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Bottom" Margin="0,6,0,0" Foreground="DimGray"
                            Text="{Binding StatusMessage}" TextWrapping="Wrap" />
@@ -163,6 +185,8 @@
                         </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Message" Width="*"
                                             Binding="{Binding Message}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Attempts" Width="70"
+                                            Binding="{Binding AttemptsUsed}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>
