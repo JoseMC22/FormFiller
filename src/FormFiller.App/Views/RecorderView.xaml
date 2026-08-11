@@ -1,0 +1,98 @@
+<UserControl x:Class="FormFiller.App.Views.RecorderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1200">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1.2*" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Header="Target Window" Grid.Column="0" Margin="0,0,4,0">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                        <Button Content="Refresh windows" Command="{Binding RefreshWindowsCommand}"
+                                Padding="10,4" />
+                        <Button Content="Start recording" Command="{Binding StartCommand}"
+                                Padding="10,4" Margin="8,0,0,0" />
+                        <Button Content="Stop" Command="{Binding StopCommand}"
+                                Padding="10,4" Margin="8,0,0,0" />
+                    </StackPanel>
+                    <ListView ItemsSource="{Binding Windows}"
+                              SelectedItem="{Binding SelectedWindow}"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock FontWeight="SemiBold" Text="{Binding ProcessName}" />
+                                    <TextBlock Text="{Binding WindowTitle}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock FontSize="11" Foreground="Gray"
+                                               Text="{Binding MainWindowHandle}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </DockPanel>
+            </GroupBox>
+
+            <GroupBox Header="Save as Recipe" Grid.Column="1" Margin="4,0,0,0">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,6">
+                        <TextBlock DockPanel.Dock="Left" Text="Template:" VerticalAlignment="Center"
+                                   Margin="0,0,6,0" />
+                        <ComboBox ItemsSource="{Binding Templates}"
+                                  SelectedItem="{Binding SelectedTemplate}"
+                                  DisplayMemberPath="Name"
+                                  VerticalContentAlignment="Center" />
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,6">
+                        <TextBlock DockPanel.Dock="Left" Text="Recipe name:" VerticalAlignment="Center"
+                                   Margin="0,0,6,0" />
+                        <TextBox Text="{Binding RecipeName, UpdateSourceTrigger=PropertyChanged}"
+                                 VerticalContentAlignment="Center" />
+                    </DockPanel>
+                    <Button Content="Save as Recipe" Command="{Binding SaveAsRecipeCommand}"
+                            Padding="12,6" HorizontalAlignment="Left" />
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+
+        <GroupBox Grid.Row="1" Header="Recorded Steps" Margin="0,8,0,0">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Steps captured while you interact with the target window. Set the Value column (Excel column name) before running."
+                           Margin="0,0,0,6" Foreground="DimGray" TextWrapping="Wrap" />
+                <DataGrid ItemsSource="{Binding RecordedSteps}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Step type" Width="*"
+                                            Binding="{Binding StepType}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Target" Width="*"
+                                            Binding="{Binding Target, UpdateSourceTrigger=PropertyChanged}" />
+                        <DataGridTextColumn Header="Value (Excel column)" Width="*"
+                                            Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </GroupBox>
+
+        <DockPanel Grid.Row="2" Margin="0,8,0,0">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="DimGray"
+                       VerticalAlignment="Center" TextWrapping="Wrap" />
+        </DockPanel>
+    </Grid>
+</UserControl>

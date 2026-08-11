@@ -19,5 +19,8 @@
         <TabItem Header="Recipes">
             <views:RecipeView />
         </TabItem>
+        <TabItem Header="Recorder">
+            <views:RecorderView />
+        </TabItem>
     </TabControl>
 </Window>
