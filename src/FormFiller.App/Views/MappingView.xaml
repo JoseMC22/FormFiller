@@ -18,13 +18,13 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <GroupBox Header="Saved Templates" Grid.Column="0" Margin="0,0,4,0">
+            <GroupBox Header="Plantillas guardadas" Grid.Column="0" Margin="0,0,4,0">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                        <Button Content="Refresh templates" Command="{Binding LoadTemplatesCommand}"
-                                Padding="10,4" />
-                        <Button Content="Load mappings" Command="{Binding LoadMappingsCommand}"
-                                Margin="8,0,0,0" Padding="10,4" />
+                        <Button Content="Actualizar plantillas" Command="{Binding LoadTemplatesCommand}"
+                                Style="{StaticResource OutlineButton}" Padding="10,4" />
+                        <Button Content="Cargar mapeos" Command="{Binding LoadMappingsCommand}"
+                                Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="10,4" />
                     </StackPanel>
                     <ListView ItemsSource="{Binding Templates}"
                               SelectedItem="{Binding SelectedTemplate}"
@@ -33,7 +33,7 @@
                             <DataTemplate>
                                 <StackPanel>
                                     <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
-                                    <TextBlock FontSize="11" Foreground="Gray"
+                                    <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}"
                                                Text="{Binding WindowTitle}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                             </DataTemplate>
@@ -42,28 +42,29 @@
                 </DockPanel>
             </GroupBox>
 
-            <GroupBox Header="Excel Data" Grid.Column="1" Margin="4,0,0,0">
+            <GroupBox Header="Datos de Excel" Grid.Column="1" Margin="4,0,0,0">
                 <StackPanel>
                     <DockPanel Margin="0,0,0,6">
-                        <Button DockPanel.Dock="Right" Content="Open Excel..."
-                                Command="{Binding OpenExcelCommand}" Padding="10,4" Margin="6,0,0,0" />
+                        <Button DockPanel.Dock="Right" Content="Abrir Excel..."
+                                Command="{Binding OpenExcelCommand}" Style="{StaticResource OutlineButton}"
+                                Padding="10,4" Margin="6,0,0,0" />
                         <TextBox Text="{Binding ExcelFilePath}" IsReadOnly="True"
                                  VerticalContentAlignment="Center" />
                     </DockPanel>
                     <DockPanel Margin="0,0,0,6">
-                        <TextBlock Text="Sheet:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Hoja:" VerticalAlignment="Center" Margin="0,0,6,0" />
                         <ComboBox ItemsSource="{Binding Sheets}"
                                   SelectedItem="{Binding SelectedSheet}" />
                     </DockPanel>
                     <DockPanel>
-                        <TextBlock Text="Columns:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Columnas:" VerticalAlignment="Center" Margin="0,0,6,0" />
                         <ListBox ItemsSource="{Binding Columns}" Height="70" />
                     </DockPanel>
                 </StackPanel>
             </GroupBox>
         </Grid>
 
-        <GroupBox Grid.Row="1" Header="Field to Column Mapping" Margin="0,8,0,0">
+        <GroupBox Grid.Row="1" Header="Mapeo de campos a columnas" Margin="0,8,0,0">
             <DataGrid ItemsSource="{Binding MappingRows}"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
@@ -72,23 +73,37 @@
                       HeadersVisibility="Column"
                       GridLinesVisibility="Horizontal">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Field name" Width="*"
+                    <DataGridTextColumn Header="Campo" Width="*"
                                         Binding="{Binding FieldName}"
                                         IsReadOnly="True" />
-                    <DataGridTextColumn Header="Field type" Width="0.7*"
-                                        Binding="{Binding FieldType}"
-                                        IsReadOnly="True" />
-                    <DataGridComboBoxColumn Header="Excel column" Width="1.2*"
-                                            SelectedItemBinding="{Binding SelectedColumn, UpdateSourceTrigger=PropertyChanged}"
-                                            ItemsSource="{Binding DataContext.Columns, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                    <DataGridTemplateColumn Header="Tipo de campo" Width="0.7*" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FieldType, Converter={StaticResource EnumToSpanishConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Columna de Excel" Width="1.2*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SelectedColumn}" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding DataContext.Columns, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                          SelectedItem="{Binding SelectedColumn, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
 
         <DockPanel Grid.Row="2" Margin="0,8,0,0">
-            <Button DockPanel.Dock="Left" Content="Save mappings"
-                    Command="{Binding SaveMappingsCommand}" Padding="12,6" />
-            <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Foreground="DimGray"
+            <Button DockPanel.Dock="Left" Content="Guardar mapeos"
+                    Command="{Binding SaveMappingsCommand}" Style="{StaticResource PrimaryButton}" Padding="12,6" />
+            <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}"
                        Text="{Binding StatusMessage}" TextWrapping="Wrap" />
         </DockPanel>
     </Grid>

@@ -28,11 +28,13 @@ public partial class RunnerViewModel : ViewModelBase
     public ObservableCollection<FormTemplate> Templates { get; } = new();
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
     private FormTemplate? _selectedTemplate;
 
     public ObservableCollection<ProcessWindowInfo> Windows { get; } = new();
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
     private ProcessWindowInfo? _selectedWindow;
 
     public ObservableCollection<string> SubmitButtons { get; } = new();
@@ -46,6 +48,7 @@ public partial class RunnerViewModel : ViewModelBase
     private Recipe? _selectedRecipe;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
     private string? _excelFilePath;
 
     public ObservableCollection<string> Sheets { get; } = new();
@@ -148,7 +151,7 @@ public partial class RunnerViewModel : ViewModelBase
             Windows.Add(window);
         }
 
-        StatusMessage = $"{Windows.Count} window(s) found.";
+        StatusMessage = $"{Windows.Count} ventana(s) encontrada(s).";
     }
 
     [RelayCommand]
@@ -156,8 +159,8 @@ public partial class RunnerViewModel : ViewModelBase
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Open Excel file",
-            Filter = "Excel files (*.xlsx)|*.xlsx"
+            Title = "Abrir archivo de Excel",
+            Filter = "Archivos de Excel (*.xlsx)|*.xlsx"
         };
 
         if (dialog.ShowDialog() != true)
@@ -173,7 +176,7 @@ public partial class RunnerViewModel : ViewModelBase
         }
 
         SelectedSheet = Sheets.FirstOrDefault();
-        StatusMessage = $"Excel file loaded: {Path.GetFileName(ExcelFilePath)}";
+        StatusMessage = $"Archivo de Excel cargado: {Path.GetFileName(ExcelFilePath)}";
     }
 
     [RelayCommand]
@@ -201,7 +204,8 @@ public partial class RunnerViewModel : ViewModelBase
             PreviewRows.Add(row);
         }
 
-        StatusMessage = $"{_allRows.Count} row(s), {Columns.Count} column(s) in sheet '{SelectedSheet}'.";
+        StatusMessage = $"{_allRows.Count} fila(s), {Columns.Count} columna(s) en la hoja '{SelectedSheet}'.";
+        RunCommand.NotifyCanExecuteChanged();
     }
 
     private void RebuildSubmitButtons()
@@ -243,7 +247,7 @@ public partial class RunnerViewModel : ViewModelBase
         var mappings = _mappingRepository.GetMappings(SelectedTemplate.Id);
         if (template is null || mappings.Count == 0)
         {
-            StatusMessage = "No field mappings found for the selected template.";
+            StatusMessage = "No se encontraron mapeos de campos para la plantilla seleccionada.";
             return;
         }
 
@@ -252,7 +256,7 @@ public partial class RunnerViewModel : ViewModelBase
         var totalRows = Math.Max(0, endRowIndex - startRowIndex + 1);
         if (totalRows == 0)
         {
-            StatusMessage = "No rows to process in the selected range.";
+            StatusMessage = "No hay filas para procesar en el rango seleccionado.";
             return;
         }
 
@@ -346,15 +350,15 @@ public partial class RunnerViewModel : ViewModelBase
 
             if (canceled)
             {
-                StatusMessage = $"Run canceled after {ProgressCurrent} row(s).";
+                StatusMessage = $"Ejecución cancelada después de {ProgressCurrent} fila(s).";
             }
             else if (runError is not null)
             {
-                StatusMessage = $"Run failed: {runError.Message}";
+                StatusMessage = $"La ejecución falló: {runError.Message}";
             }
             else
             {
-                StatusMessage = $"Completed: {okCount} OK, {failedCount} failed.";
+                StatusMessage = $"Completado: {okCount} correctas, {failedCount} con error.";
             }
         }
     }
@@ -392,7 +396,7 @@ public partial class RunnerViewModel : ViewModelBase
 
         var dialog = new SaveFileDialog
         {
-            Title = "Export run report",
+            Title = "Exportar reporte de ejecución",
             Filter = "CSV files (*.csv)|*.csv|Excel files (*.xlsx)|*.xlsx",
             DefaultExt = ".csv"
         };
@@ -415,11 +419,11 @@ public partial class RunnerViewModel : ViewModelBase
                 RunReportExporter.ToCsv(results, writer);
             }
 
-            StatusMessage = $"Report exported: {Path.GetFileName(dialog.FileName)}";
+            StatusMessage = $"Reporte exportado: {Path.GetFileName(dialog.FileName)}";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to export report: {ex.Message}";
+            StatusMessage = $"No se pudo exportar el reporte: {ex.Message}";
         }
     }
 }

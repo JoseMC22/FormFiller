@@ -94,8 +94,8 @@ public partial class MappingViewModel : ViewModelBase
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Open Excel file",
-            Filter = "Excel files (*.xlsx)|*.xlsx"
+            Title = "Abrir archivo de Excel",
+            Filter = "Archivos de Excel (*.xlsx)|*.xlsx"
         };
 
         if (dialog.ShowDialog() != true)
@@ -111,7 +111,7 @@ public partial class MappingViewModel : ViewModelBase
         }
 
         SelectedSheet = Sheets.FirstOrDefault();
-        StatusMessage = $"Excel file loaded: {Path.GetFileName(ExcelFilePath)}";
+        StatusMessage = $"Archivo de Excel cargado: {Path.GetFileName(ExcelFilePath)}";
     }
 
     [RelayCommand]
@@ -128,7 +128,7 @@ public partial class MappingViewModel : ViewModelBase
             Columns.Add(column);
         }
 
-        StatusMessage = $"{Columns.Count} column(s) in sheet '{SelectedSheet}'.";
+        StatusMessage = $"{Columns.Count} columna(s) en la hoja '{SelectedSheet}'.";
     }
 
     [RelayCommand]
@@ -162,7 +162,7 @@ public partial class MappingViewModel : ViewModelBase
             MappingRows.Add(row);
         }
 
-        StatusMessage = $"{MappingRows.Count} fillable field(s) for template '{SelectedTemplate.Name}'.";
+        StatusMessage = $"{MappingRows.Count} campo(s) completables para la plantilla '{SelectedTemplate.Name}'.";
     }
 
     [RelayCommand]
@@ -170,7 +170,7 @@ public partial class MappingViewModel : ViewModelBase
     {
         if (SelectedTemplate is null)
         {
-            StatusMessage = "Select a template before saving mappings.";
+            StatusMessage = "Seleccione una plantilla antes de guardar los mapeos.";
             return;
         }
 
@@ -187,11 +187,11 @@ public partial class MappingViewModel : ViewModelBase
 
         if (mappings.Count == 0)
         {
-            StatusMessage = "Map at least one field to an Excel column before saving.";
+            StatusMessage = "Mapee al menos un campo a una columna de Excel antes de guardar.";
             return;
         }
 
         _mappingRepository.SaveMappings(SelectedTemplate.Id, mappings);
-        StatusMessage = $"Mapping saved for template {SelectedTemplate.Name} ({mappings.Count} fields).";
+        StatusMessage = $"Mapeo guardado para la plantilla {SelectedTemplate.Name} ({mappings.Count} campos).";
     }
 }

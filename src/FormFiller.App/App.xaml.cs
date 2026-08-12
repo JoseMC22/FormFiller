@@ -21,11 +21,11 @@ public partial class App : Application
             if (status.State is TrialState.Expired or TrialState.Tampered)
             {
                 var message = status.State == TrialState.Tampered
-                    ? "The trial license state could not be verified because the system clock appears to have been moved backwards. Restore the correct date or purchase a license to keep using FormFiller."
-                    : "Your 15-day trial has ended. Purchase a license to keep using FormFiller.";
+                    ? "No se pudo verificar el estado de la licencia de prueba porque el reloj del sistema parece haberse retrocedido. Restaure la fecha correcta o adquiera una licencia para seguir usando FormFiller."
+                    : "Su prueba de 15 días ha finalizado. Adquiera una licencia para seguir usando FormFiller.";
                 MessageBox.Show(
                     message,
-                    "Trial Expired",
+                    "Prueba caducada",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 Shutdown();
@@ -35,8 +35,8 @@ public partial class App : Application
             if (status.State == TrialState.TrialActive && status.RemainingDays is int remaining)
             {
                 trialBanner = remaining == 1
-                    ? "Trial: 1 day remaining"
-                    : $"Trial: {remaining} days remaining";
+                    ? "Prueba: 1 día restante"
+                    : $"Prueba: {remaining} días restantes";
             }
         }
 

@@ -42,7 +42,7 @@ public partial class InspectorViewModel : ViewModelBase
             Windows.Add(window);
         }
 
-        StatusMessage = $"{Windows.Count} window(s) found.";
+        StatusMessage = $"{Windows.Count} ventana(s) encontrada(s).";
     }
 
     [RelayCommand]
@@ -50,7 +50,7 @@ public partial class InspectorViewModel : ViewModelBase
     {
         if (SelectedWindow is null)
         {
-            StatusMessage = "Select a window to capture first.";
+            StatusMessage = "Seleccione primero una ventana para capturar.";
             return;
         }
 
@@ -75,7 +75,7 @@ public partial class InspectorViewModel : ViewModelBase
             TemplateName = SelectedWindow.WindowTitle;
         }
 
-        StatusMessage = $"{DetectedFields.Count} field(s) detected.";
+        StatusMessage = $"{DetectedFields.Count} campo(s) detectado(s).";
     }
 
     [RelayCommand]
@@ -83,13 +83,13 @@ public partial class InspectorViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(TemplateName))
         {
-            StatusMessage = "Template name is required.";
+            StatusMessage = "El nombre de la plantilla es obligatorio.";
             return;
         }
 
         if (DetectedFields.Count == 0)
         {
-            StatusMessage = "Capture a window to detect fields first.";
+            StatusMessage = "Capture primero una ventana para detectar campos.";
             return;
         }
 
@@ -103,7 +103,7 @@ public partial class InspectorViewModel : ViewModelBase
 
         var id = _repository.SaveTemplate(template);
         LoadTemplates();
-        StatusMessage = $"Template saved (Id {id}).";
+        StatusMessage = $"Plantilla guardada (Id {id}).";
     }
 
     [RelayCommand]
@@ -121,13 +121,13 @@ public partial class InspectorViewModel : ViewModelBase
     {
         if (SelectedSavedTemplate is null)
         {
-            StatusMessage = "Select a saved template to delete.";
+            StatusMessage = "Seleccione una plantilla guardada para eliminar.";
             return;
         }
 
         _repository.DeleteTemplate(SelectedSavedTemplate.Id);
         LoadTemplates();
         SelectedSavedTemplate = null;
-        StatusMessage = "Template deleted.";
+        StatusMessage = "Plantilla eliminada.";
     }
 }

@@ -21,10 +21,11 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <GroupBox Header="Templates" Grid.Column="0" Margin="0,0,4,0">
+            <GroupBox Header="Plantillas" Grid.Column="0" Margin="0,0,4,0">
                 <DockPanel>
-                    <Button DockPanel.Dock="Top" Content="Refresh templates"
-                            Command="{Binding LoadTemplatesCommand}" Padding="10,4" Margin="0,0,0,6" />
+                    <Button DockPanel.Dock="Top" Content="Actualizar plantillas"
+                            Command="{Binding LoadTemplatesCommand}" Style="{StaticResource OutlineButton}"
+                            Padding="10,4" Margin="0,0,0,6" />
                     <ListView ItemsSource="{Binding Templates}"
                               SelectedItem="{Binding SelectedTemplate}"
                               Height="110">
@@ -32,7 +33,7 @@
                             <DataTemplate>
                                 <StackPanel>
                                     <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
-                                    <TextBlock FontSize="11" Foreground="Gray"
+                                    <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}"
                                                Text="{Binding WindowTitle}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                             </DataTemplate>
@@ -41,10 +42,11 @@
                 </DockPanel>
             </GroupBox>
 
-            <GroupBox Header="Target Window" Grid.Column="1" Margin="4,0,4,0">
+            <GroupBox Header="Ventana de destino" Grid.Column="1" Margin="4,0,4,0">
                 <DockPanel>
-                    <Button DockPanel.Dock="Top" Content="Refresh windows"
-                            Command="{Binding RefreshWindowsCommand}" Padding="10,4" Margin="0,0,0,6" />
+                    <Button DockPanel.Dock="Top" Content="Actualizar ventanas"
+                            Command="{Binding RefreshWindowsCommand}" Style="{StaticResource OutlineButton}"
+                            Padding="10,4" Margin="0,0,0,6" />
                     <ListView ItemsSource="{Binding Windows}"
                               SelectedItem="{Binding SelectedWindow}"
                               Height="110">
@@ -52,7 +54,7 @@
                             <DataTemplate>
                                 <StackPanel>
                                     <TextBlock FontWeight="SemiBold" Text="{Binding ProcessName}" />
-                                    <TextBlock FontSize="11" Foreground="Gray"
+                                    <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}"
                                                Text="{Binding WindowTitle}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                             </DataTemplate>
@@ -61,16 +63,17 @@
                 </DockPanel>
             </GroupBox>
 
-            <GroupBox Header="Excel Data" Grid.Column="2" Margin="4,0,0,0">
+            <GroupBox Header="Datos de Excel" Grid.Column="2" Margin="4,0,0,0">
                 <StackPanel>
                     <DockPanel Margin="0,0,0,6">
-                        <Button DockPanel.Dock="Right" Content="Open Excel..."
-                                Command="{Binding OpenExcelCommand}" Padding="10,4" Margin="6,0,0,0" />
+                        <Button DockPanel.Dock="Right" Content="Abrir Excel..."
+                                Command="{Binding OpenExcelCommand}" Style="{StaticResource OutlineButton}"
+                                Padding="10,4" Margin="6,0,0,0" />
                         <TextBox Text="{Binding ExcelFilePath}" IsReadOnly="True"
                                  VerticalContentAlignment="Center" />
                     </DockPanel>
                     <DockPanel>
-                        <TextBlock Text="Sheet:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Hoja:" VerticalAlignment="Center" Margin="0,0,6,0" />
                         <ComboBox ItemsSource="{Binding Sheets}"
                                   SelectedItem="{Binding SelectedSheet}" />
                     </DockPanel>
@@ -94,32 +97,37 @@
                 <ColumnDefinition Width="40" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="Recipe (optional):" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBlock Grid.Column="0" Text="Receta (opcional):" VerticalAlignment="Center" Margin="0,0,6,0" />
             <ComboBox Grid.Column="1" ItemsSource="{Binding Recipes}"
                       SelectedItem="{Binding SelectedRecipe}"
                       DisplayMemberPath="Name" Margin="0,0,8,0" />
 
-            <TextBlock Grid.Column="2" Text="Submit button:" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBlock Grid.Column="2" Text="Botón de envío:" VerticalAlignment="Center" Margin="0,0,6,0" />
             <ComboBox Grid.Column="3" ItemsSource="{Binding SubmitButtons}"
                       SelectedItem="{Binding SelectedSubmitButton}" Margin="0,0,8,0" />
 
-            <TextBlock Grid.Column="4" Text="Start row:" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBlock Grid.Column="4" Text="Fila inicial:" VerticalAlignment="Center" Margin="0,0,6,0" />
             <TextBox Grid.Column="5" VerticalContentAlignment="Center"
                      Text="{Binding StartRow, UpdateSourceTrigger=PropertyChanged}" />
 
-            <TextBlock Grid.Column="6" Text="End row:" VerticalAlignment="Center" Margin="8,0,6,0" />
+            <TextBlock Grid.Column="6" Text="Fila final:" VerticalAlignment="Center" Margin="8,0,6,0" />
             <TextBox Grid.Column="7" VerticalContentAlignment="Center"
                      Text="{Binding EndRow, UpdateSourceTrigger=PropertyChanged}" />
 
             <StackPanel Grid.Column="8" Orientation="Horizontal" Margin="12,0,0,0">
-                <Button Content="Run" Command="{Binding RunCommand}" Padding="14,5" FontWeight="Bold" />
-                <Button Content="Stop" Command="{Binding StopCommand}" Padding="14,5" Margin="6,0,0,0" />
-                <Button Content="Pause" Command="{Binding PauseCommand}" Padding="10,5" Margin="6,0,0,0" />
-                <Button Content="Resume" Command="{Binding ResumeCommand}" Padding="10,5" Margin="6,0,0,0" />
-                <Button Content="Export..." Command="{Binding ExportReportCommand}" Padding="10,5" Margin="6,0,0,0" />
+                <Button Content="Ejecutar" Command="{Binding RunCommand}" Style="{StaticResource PrimaryButton}"
+                        Padding="14,5" FontWeight="Bold" />
+                <Button Content="Detener" Command="{Binding StopCommand}" Style="{StaticResource DangerButton}"
+                        Padding="14,5" Margin="6,0,0,0" />
+                <Button Content="Pausar" Command="{Binding PauseCommand}" Style="{StaticResource OutlineButton}"
+                        Padding="10,5" Margin="6,0,0,0" />
+                <Button Content="Reanudar" Command="{Binding ResumeCommand}" Style="{StaticResource OutlineButton}"
+                        Padding="10,5" Margin="6,0,0,0" />
+                <Button Content="Exportar..." Command="{Binding ExportReportCommand}" Style="{StaticResource OutlineButton}"
+                        Padding="10,5" Margin="6,0,0,0" />
             </StackPanel>
 
-            <TextBlock Grid.Column="10" Text="Row:" VerticalAlignment="Center" HorizontalAlignment="Right"
+            <TextBlock Grid.Column="10" Text="Fila:" VerticalAlignment="Center" HorizontalAlignment="Right"
                        Margin="12,0,4,0" />
             <TextBlock Grid.Column="11" Text="{Binding CurrentRow}" VerticalAlignment="Center" />
         </Grid>
@@ -133,11 +141,11 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="Max retries per row:" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBlock Grid.Column="0" Text="Reintentos máximos por fila:" VerticalAlignment="Center" Margin="0,0,6,0" />
             <TextBox Grid.Column="1" VerticalContentAlignment="Center"
                      Text="{Binding MaxRetriesPerRow, UpdateSourceTrigger=PropertyChanged}" />
 
-            <TextBlock Grid.Column="2" Text="Retry delay (ms):" VerticalAlignment="Center" Margin="12,0,6,0" />
+            <TextBlock Grid.Column="2" Text="Espera entre reintentos (ms):" VerticalAlignment="Center" Margin="12,0,6,0" />
             <TextBox Grid.Column="3" VerticalContentAlignment="Center"
                      Text="{Binding RetryDelayMilliseconds, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
@@ -146,9 +154,9 @@
                      Minimum="0" Maximum="{Binding ProgressTotal}"
                      Value="{Binding ProgressCurrent}" />
 
-        <GroupBox Grid.Row="4" Header="Results" Margin="0,8,0,0">
+        <GroupBox Grid.Row="4" Header="Resultados" Margin="0,8,0,0">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Bottom" Margin="0,6,0,0" Foreground="DimGray"
+                <TextBlock DockPanel.Dock="Bottom" Margin="0,6,0,0" Foreground="{StaticResource TextMutedBrush}"
                            Text="{Binding StatusMessage}" TextWrapping="Wrap" />
                 <DataGrid ItemsSource="{Binding Results}"
                           AutoGenerateColumns="False"
@@ -157,7 +165,7 @@
                           HeadersVisibility="Column"
                           GridLinesVisibility="Horizontal">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Row" Width="60"
+                        <DataGridTextColumn Header="Fila" Width="60"
                                             Binding="{Binding RowNumber}" IsReadOnly="True" />
                         <DataGridTemplateColumn Header="OK" Width="60" IsReadOnly="True">
                             <DataGridTemplateColumn.CellTemplate>
@@ -166,15 +174,15 @@
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Text" Value="" />
-                                                <Setter Property="Foreground" Value="Gray" />
+                                                <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Success}" Value="True">
                                                         <Setter Property="Text" Value="&#x2713;" />
-                                                        <Setter Property="Foreground" Value="Green" />
+                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Success}" Value="False">
                                                         <Setter Property="Text" Value="&#x2717;" />
-                                                        <Setter Property="Foreground" Value="Red" />
+                                                        <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -183,9 +191,9 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Message" Width="*"
+                        <DataGridTextColumn Header="Mensaje" Width="*"
                                             Binding="{Binding Message}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Attempts" Width="70"
+                        <DataGridTextColumn Header="Intentos" Width="70"
                                             Binding="{Binding AttemptsUsed}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>

@@ -61,7 +61,7 @@ public partial class RecorderViewModel : ViewModelBase
             Windows.Add(window);
         }
 
-        StatusMessage = $"{Windows.Count} window(s) found.";
+        StatusMessage = $"{Windows.Count} ventana(s) encontrada(s).";
     }
 
     private void LoadTemplates()
@@ -90,14 +90,14 @@ public partial class RecorderViewModel : ViewModelBase
         {
             recorder.StepRecorded -= OnStepRecorded;
             recorder.Dispose();
-            StatusMessage = $"Failed to start recording: {ex.Message}";
+            StatusMessage = $"No se pudo iniciar la grabación: {ex.Message}";
             return;
         }
 
         _recorder = recorder;
         RecordedSteps.Clear();
         IsRecording = true;
-        StatusMessage = $"Recording on '{SelectedWindow.WindowTitle}'. Interact with the target window now.";
+        StatusMessage = $"Grabando en '{SelectedWindow.WindowTitle}'. Interactúe con la ventana de destino ahora.";
     }
 
     private bool CanStop() => IsRecording;
@@ -119,7 +119,7 @@ public partial class RecorderViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to stop recording: {ex.Message}";
+            StatusMessage = $"No se pudo detener la grabación: {ex.Message}";
         }
         finally
         {
@@ -127,7 +127,7 @@ public partial class RecorderViewModel : ViewModelBase
             IsRecording = false;
         }
 
-        StatusMessage = $"Recording stopped. {RecordedSteps.Count} step(s) captured.";
+        StatusMessage = $"Grabación detenida. Se capturaron {RecordedSteps.Count} paso(s).";
     }
 
     private bool CanSaveAsRecipe() =>
@@ -141,19 +141,19 @@ public partial class RecorderViewModel : ViewModelBase
     {
         if (SelectedTemplate is null)
         {
-            StatusMessage = "Select a template before saving a recipe.";
+            StatusMessage = "Seleccione una plantilla antes de guardar una receta.";
             return;
         }
 
         if (RecordedSteps.Count == 0)
         {
-            StatusMessage = "Record at least one step before saving.";
+            StatusMessage = "Grabe al menos un paso antes de guardar.";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(RecipeName))
         {
-            StatusMessage = "Type a name for the recipe before saving.";
+            StatusMessage = "Escriba un nombre para la receta antes de guardar.";
             return;
         }
 
@@ -173,7 +173,7 @@ public partial class RecorderViewModel : ViewModelBase
         };
 
         var id = _recipeRepository.SaveRecipe(recipe);
-        StatusMessage = $"Recipe '{recipe.Name}' saved (Id {id}). It is available from the Runner tab.";
+        StatusMessage = $"Receta '{recipe.Name}' guardada (Id {id}). Está disponible en la pestaña Ejecución.";
     }
 
     private void OnStepRecorded(RecipeStep step)

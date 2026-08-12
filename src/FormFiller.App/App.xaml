@@ -1,8 +1,14 @@
 ﻿<Application x:Class="FormFiller.App.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FormFiller.App">
+             xmlns:local="clr-namespace:FormFiller.App"
+             xmlns:converters="clr-namespace:FormFiller.App.Converters">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Theme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:EnumToSpanishConverter x:Key="EnumToSpanishConverter" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

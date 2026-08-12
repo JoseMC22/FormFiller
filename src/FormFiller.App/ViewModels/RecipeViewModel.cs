@@ -98,12 +98,12 @@ public partial class RecipeViewModel : ViewModelBase
     {
         if (SelectedTemplate is null)
         {
-            StatusMessage = "Select a template before creating a recipe.";
+            StatusMessage = "Seleccione una plantilla antes de crear una receta.";
             return;
         }
 
         SelectedRecipe = new Recipe { TemplateId = SelectedTemplate.Id };
-        StatusMessage = "New recipe created. Type a name, add steps, then save.";
+        StatusMessage = "Receta creada. Escriba un nombre, agregue pasos y luego guarde.";
     }
 
     [RelayCommand]
@@ -111,13 +111,13 @@ public partial class RecipeViewModel : ViewModelBase
     {
         if (SelectedRecipe is null || SelectedRecipe.Id <= 0)
         {
-            StatusMessage = "Select a saved recipe to delete.";
+            StatusMessage = "Seleccione una receta guardada para eliminar.";
             return;
         }
 
         var name = SelectedRecipe.Name;
         _recipeRepository.DeleteRecipe(SelectedRecipe.Id);
-        StatusMessage = $"Recipe '{name}' deleted.";
+        StatusMessage = $"Receta '{name}' eliminada.";
         LoadRecipes();
     }
 
@@ -126,25 +126,25 @@ public partial class RecipeViewModel : ViewModelBase
     {
         if (SelectedTemplate is null)
         {
-            StatusMessage = "Select a template before saving a recipe.";
+            StatusMessage = "Seleccione una plantilla antes de guardar una receta.";
             return;
         }
 
         if (SelectedRecipe is null)
         {
-            StatusMessage = "Create a new recipe before saving.";
+            StatusMessage = "Cree una nueva receta antes de guardar.";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(SelectedRecipe.Name))
         {
-            StatusMessage = "Type a name for the recipe before saving.";
+            StatusMessage = "Escriba un nombre para la receta antes de guardar.";
             return;
         }
 
         if (Steps.Count == 0)
         {
-            StatusMessage = "Add at least one step before saving.";
+            StatusMessage = "Agregue al menos un paso antes de guardar.";
             return;
         }
 
@@ -154,7 +154,7 @@ public partial class RecipeViewModel : ViewModelBase
 
         var savedId = SelectedRecipe.Id;
         var savedName = SelectedRecipe.Name;
-        StatusMessage = $"Recipe '{savedName}' saved.";
+        StatusMessage = $"Receta '{savedName}' guardada.";
         LoadRecipes();
         SelectedRecipe = Recipes.FirstOrDefault(r => r.Id == savedId);
     }
@@ -164,7 +164,7 @@ public partial class RecipeViewModel : ViewModelBase
     {
         if (SelectedRecipe is null)
         {
-            StatusMessage = "Select or create a recipe before adding steps.";
+            StatusMessage = "Seleccione o cree una receta antes de agregar pasos.";
             return;
         }
 
@@ -182,7 +182,7 @@ public partial class RecipeViewModel : ViewModelBase
     {
         if (SelectedStep is null)
         {
-            StatusMessage = "Select a step to remove.";
+            StatusMessage = "Seleccione un paso para quitar.";
             return;
         }
 

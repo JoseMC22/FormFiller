@@ -16,10 +16,11 @@
             <ColumnDefinition Width="1.4*" />
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Windows" Grid.Column="0" Margin="0,0,4,0">
+        <GroupBox Header="Ventanas" Grid.Column="0" Margin="0,0,4,0">
             <DockPanel>
-                <Button DockPanel.Dock="Top" Content="Refresh"
+                <Button DockPanel.Dock="Top" Content="Actualizar"
                         Command="{Binding RefreshWindowsCommand}"
+                        Style="{StaticResource OutlineButton}"
                         Margin="0,0,0,6" Padding="10,4" HorizontalAlignment="Left" />
                 <ListView ItemsSource="{Binding Windows}"
                           SelectedItem="{Binding SelectedWindow}"
@@ -29,7 +30,7 @@
                             <StackPanel>
                                 <TextBlock FontWeight="SemiBold" Text="{Binding ProcessName}" />
                                 <TextBlock Text="{Binding WindowTitle}" TextTrimming="CharacterEllipsis" />
-                                <TextBlock FontSize="11" Foreground="Gray"
+                                <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}"
                                            Text="{Binding MainWindowHandle}" />
                             </StackPanel>
                         </DataTemplate>
@@ -38,10 +39,11 @@
             </DockPanel>
         </GroupBox>
 
-        <GroupBox Header="Control Tree" Grid.Column="1" Margin="4,0">
+        <GroupBox Header="Árbol de controles" Grid.Column="1" Margin="4,0">
             <DockPanel>
-                <Button DockPanel.Dock="Top" Content="Capture Fields"
+                <Button DockPanel.Dock="Top" Content="Capturar campos"
                         Command="{Binding CaptureWindowCommand}"
+                        Style="{StaticResource PrimaryButton}"
                         Margin="0,0,0,6" Padding="10,4" HorizontalAlignment="Left" />
                 <TreeView ItemsSource="{Binding ControlTree}"
                           VirtualizingPanel.IsVirtualizing="True">
@@ -62,15 +64,14 @@
             </DockPanel>
         </GroupBox>
 
-        <GroupBox Header="Detected Fields" Grid.Column="2" Margin="4,0,0,0">
+        <GroupBox Header="Campos detectados" Grid.Column="2" Margin="4,0,0,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                    <TextBlock Text="Template name:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBlock Text="Nombre de la plantilla:" VerticalAlignment="Center" Margin="0,0,6,0" />
                     <TextBox Text="{Binding TemplateName, UpdateSourceTrigger=PropertyChanged}"
                              MinWidth="180" VerticalContentAlignment="Center" />
-                    <Button Content="Save Template" Command="{Binding SaveTemplateCommand}"
-                            Margin="8,0,0,0" Padding="10,4" />
-                    <Button Content="Delete" Command="{Binding DeleteTemplateCommand}"
+                    <Button Content="Guardar plantilla" Command="{Binding SaveTemplateCommand}"
+                            Style="{StaticResource PrimaryButton}"
                             Margin="8,0,0,0" Padding="10,4" />
                 </StackPanel>
                 <DataGrid ItemsSource="{Binding DetectedFields}"
@@ -81,24 +82,30 @@
                           HeadersVisibility="Column"
                           GridLinesVisibility="Horizontal">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Width="*"
+                        <DataGridTextColumn Header="Nombre" Width="*"
                                             Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-                        <DataGridTextColumn Header="AutomationId" Width="1.2*"
+                        <DataGridTextColumn Header="ID de automatización" Width="1.2*"
                                             Binding="{Binding AutomationId}"
                                             IsReadOnly="True" />
-                        <DataGridTextColumn Header="ControlType" Width="0.8*"
+                        <DataGridTextColumn Header="Tipo de control" Width="0.8*"
                                             Binding="{Binding ControlType}"
                                             IsReadOnly="True" />
-                        <DataGridTemplateColumn Header="FieldType" Width="0.9*">
+                        <DataGridTemplateColumn Header="Tipo de campo" Width="0.9*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding FieldType}" />
+                                    <TextBlock Text="{Binding FieldType, Converter={StaticResource EnumToSpanishConverter}}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
                                 <DataTemplate>
                                     <ComboBox ItemsSource="{Binding DataContext.FieldTypeValues, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                              SelectedItem="{Binding FieldType, UpdateSourceTrigger=PropertyChanged}" />
+                                              SelectedItem="{Binding FieldType, UpdateSourceTrigger=PropertyChanged}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Converter={StaticResource EnumToSpanishConverter}}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
@@ -124,12 +131,16 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <Button Grid.Column="1" Content="Load Templates" Command="{Binding LoadTemplatesCommand}"
-                    Margin="8,0" Padding="10,4" VerticalAlignment="Top" />
+            <StackPanel Grid.Column="1" Margin="8,0" VerticalAlignment="Top">
+                <Button Content="Cargar plantillas" Command="{Binding LoadTemplatesCommand}"
+                        Style="{StaticResource OutlineButton}" Padding="10,4" />
+                <Button Content="Eliminar plantilla" Command="{Binding DeleteTemplateCommand}"
+                        Style="{StaticResource DangerButton}" Margin="0,6,0,0" Padding="10,4" />
+            </StackPanel>
 
             <TextBlock Grid.Column="2" Text="{Binding StatusMessage}"
                        VerticalAlignment="Center" Margin="8,0,0,0"
-                       Foreground="DimGray" TextWrapping="Wrap" />
+                       Foreground="{StaticResource TextMutedBrush}" TextWrapping="Wrap" />
         </Grid>
     </Grid>
 </UserControl>

@@ -5,27 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:FormFiller.App.Views"
         mc:Ignorable="d"
-        Title="FormFiller" Height="700" Width="1200">
+        Title="FormFiller" Height="700" Width="1200" Background="{StaticResource BackgroundBrush}">
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
-                <TextBlock x:Name="TrialStatusText" Foreground="DimGray" />
+                <TextBlock x:Name="TrialStatusText" Foreground="{StaticResource TextMutedBrush}" />
             </StatusBarItem>
         </StatusBar>
         <TabControl>
-            <TabItem Header="Inspector">
+            <TabItem Header="Inspección">
                 <views:InspectorView />
             </TabItem>
-            <TabItem Header="Mapping">
+            <TabItem Header="Mapeo de campos">
                 <views:MappingView />
             </TabItem>
-            <TabItem Header="Runner">
+            <TabItem Header="Ejecución">
                 <views:RunnerView />
             </TabItem>
-            <TabItem Header="Recipes">
+            <TabItem Header="Recetas">
                 <views:RecipeView />
             </TabItem>
-            <TabItem Header="Recorder">
+            <TabItem Header="Grabador">
                 <views:RecorderView />
             </TabItem>
         </TabControl>
